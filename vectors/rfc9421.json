@@ -1,0 +1,113 @@
+{
+  "source": "RFC 9421, Appendix B. Values copied verbatim, RFC 8792 line wrapping undone.",
+  "request": {
+    "method": "POST",
+    "url": "https://example.com/foo?param=Value&Pet=dog",
+    "body": "{\"hello\": \"world\"}",
+    "headers": {
+      "Host": "example.com",
+      "Date": "Tue, 20 Apr 2021 02:07:55 GMT",
+      "Content-Type": "application/json",
+      "Content-Digest": "sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:",
+      "Content-Length": "18"
+    }
+  },
+  "keys": {
+    "test-shared-secret": {
+      "alg": "hmac-sha256",
+      "key_base64": "uzvJfB4u3N0Jy4T7NZ75MDVcr8zSTInedJtkgcu46YW4XByzNJjxBdtjUkdJPBtbmHhIDi6pcl8jsasjlTMtDQ=="
+    },
+    "test-key-ed25519": {
+      "alg": "ed25519",
+      "private_pem": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIJ+DYvh6SEqVTm50DFtMDoQikTmiCqirVv9mWG9qfSnF\n-----END PRIVATE KEY-----\n",
+      "public_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAJrQLj5P/89iXES9+vFgrIy29clF9CC/oPPsw3c5D0bs=\n-----END PUBLIC KEY-----\n"
+    }
+  },
+  "cases": [
+    {
+      "name": "B.2.1 minimal signature (base only)",
+      "label": "sig-b21",
+      "components": [],
+      "params": {
+        "created": 1618884473,
+        "keyid": "test-key-rsa-pss",
+        "nonce": "b3k2pp5k7z-50gnwp.yemd"
+      },
+      "signature_input": "sig-b21=();created=1618884473;keyid=\"test-key-rsa-pss\";nonce=\"b3k2pp5k7z-50gnwp.yemd\"",
+      "signature_base": "\"@signature-params\": ();created=1618884473;keyid=\"test-key-rsa-pss\";nonce=\"b3k2pp5k7z-50gnwp.yemd\""
+    },
+    {
+      "name": "B.2.2 selective covered components (base only)",
+      "label": "sig-b22",
+      "components": [
+        "@authority",
+        "content-digest",
+        "@query-param;name=\"Pet\""
+      ],
+      "params": {
+        "created": 1618884473,
+        "keyid": "test-key-rsa-pss",
+        "tag": "header-example"
+      },
+      "signature_input": "sig-b22=(\"@authority\" \"content-digest\" \"@query-param\";name=\"Pet\");created=1618884473;keyid=\"test-key-rsa-pss\";tag=\"header-example\"",
+      "signature_base": "\"@authority\": example.com\n\"content-digest\": sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:\n\"@query-param\";name=\"Pet\": dog\n\"@signature-params\": (\"@authority\" \"content-digest\" \"@query-param\";name=\"Pet\");created=1618884473;keyid=\"test-key-rsa-pss\";tag=\"header-example\""
+    },
+    {
+      "name": "B.2.3 full coverage (base only)",
+      "label": "sig-b23",
+      "components": [
+        "date",
+        "@method",
+        "@path",
+        "@query",
+        "@authority",
+        "content-type",
+        "content-digest",
+        "content-length"
+      ],
+      "params": {
+        "created": 1618884473,
+        "keyid": "test-key-rsa-pss"
+      },
+      "signature_input": "sig-b23=(\"date\" \"@method\" \"@path\" \"@query\" \"@authority\" \"content-type\" \"content-digest\" \"content-length\");created=1618884473;keyid=\"test-key-rsa-pss\"",
+      "signature_base": "\"date\": Tue, 20 Apr 2021 02:07:55 GMT\n\"@method\": POST\n\"@path\": /foo\n\"@query\": ?param=Value&Pet=dog\n\"@authority\": example.com\n\"content-type\": application/json\n\"content-digest\": sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:\n\"content-length\": 18\n\"@signature-params\": (\"date\" \"@method\" \"@path\" \"@query\" \"@authority\" \"content-type\" \"content-digest\" \"content-length\");created=1618884473;keyid=\"test-key-rsa-pss\""
+    },
+    {
+      "name": "B.2.5 signing a request using hmac-sha256",
+      "label": "sig-b25",
+      "key": "test-shared-secret",
+      "components": [
+        "date",
+        "@authority",
+        "content-type"
+      ],
+      "params": {
+        "created": 1618884473,
+        "keyid": "test-shared-secret"
+      },
+      "signature_input": "sig-b25=(\"date\" \"@authority\" \"content-type\");created=1618884473;keyid=\"test-shared-secret\"",
+      "signature": "sig-b25=:pxcQw6G3AjtMBQjwo8XzkZf/bws5LelbaMk5rGIGtE8=:",
+      "signature_base": "\"date\": Tue, 20 Apr 2021 02:07:55 GMT\n\"@authority\": example.com\n\"content-type\": application/json\n\"@signature-params\": (\"date\" \"@authority\" \"content-type\");created=1618884473;keyid=\"test-shared-secret\""
+    },
+    {
+      "name": "B.2.6 signing a request using ed25519",
+      "label": "sig-b26",
+      "key": "test-key-ed25519",
+      "components": [
+        "date",
+        "@method",
+        "@path",
+        "@authority",
+        "content-type",
+        "content-length"
+      ],
+      "params": {
+        "created": 1618884473,
+        "keyid": "test-key-ed25519"
+      },
+      "signature_input": "sig-b26=(\"date\" \"@method\" \"@path\" \"@authority\" \"content-type\" \"content-length\");created=1618884473;keyid=\"test-key-ed25519\"",
+      "signature": "sig-b26=:wqcAqbmYJ2ji2glfAMaRy4gruYYnx2nEFN2HN6jrnDnQCK1u02Gb04v9EDgwUPiu4A0w6vuQv5lIp5WPpBKRCw==:",
+      "signature_base": "\"date\": Tue, 20 Apr 2021 02:07:55 GMT\n\"@method\": POST\n\"@path\": /foo\n\"@authority\": example.com\n\"content-type\": application/json\n\"content-length\": 18\n\"@signature-params\": (\"date\" \"@method\" \"@path\" \"@authority\" \"content-type\" \"content-length\");created=1618884473;keyid=\"test-key-ed25519\""
+    }
+  ]
+}

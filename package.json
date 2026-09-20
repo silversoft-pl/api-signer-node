@@ -1,0 +1,46 @@
+{
+  "name": "@silversoft/api-signer",
+  "version": "1.0.0",
+  "description": "HTTP request signing and verification per RFC 9421 (HTTP Message Signatures), with no dependencies. The PHP counterpart is silversoft/api-signer.",
+  "license": "MIT",
+  "homepage": "https://github.com/silversoft-pl/api-signer-node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silversoft-pl/api-signer-node.git"
+  },
+  "keywords": [
+    "rfc9421",
+    "http-signatures",
+    "http-message-signatures",
+    "hmac",
+    "ed25519",
+    "api",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "js/index.js",
+  "module": "index.mjs",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./js/index.js"
+    }
+  },
+  "files": [
+    "js/",
+    "index.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/",
+    "cross": "node tools/cross/run.js",
+    "interop": "node tools/interop/run.mjs",
+    "sync-vectors": "node tools/sync-vectors.js"
+  },
+  "bugs": {
+    "url": "https://github.com/silversoft-pl/api-signer-node/issues"
+  }
+}

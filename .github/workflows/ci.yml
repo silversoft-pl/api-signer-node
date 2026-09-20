@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # The PHP package is a separate repository, so nothing here notices when it
+    # changes. A weekly run catches drift that no pull request would.
+    - cron: '0 6 * * 1'
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --test test/
+
+  interop:
+    name: Interop with an independent RFC 9421 implementation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save @misskey-dev/node-http-message-signatures
+      - run: node tools/interop/run.mjs
+
+  cross:
+    name: Node ${{ matrix.node }} <-> PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '24']
+        php: ['7.4', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: api-signer-node
+      - uses: actions/checkout@v4
+        with:
+          repository: silversoft-pl/api-signer-php
+          path: api-signer-php
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: hash, json, sodium
+      - run: composer update --prefer-dist --no-interaction
+        working-directory: api-signer-php
+      # Also fails when vectors/ differs between the two repositories.
+      - run: node tools/cross/run.js
+        working-directory: api-signer-node
+        env:
+          API_SIGNER_PHP: ${{ github.workspace }}/api-signer-php
