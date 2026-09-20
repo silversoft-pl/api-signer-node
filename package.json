@@ -34,6 +34,9 @@
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "node --test test/*.test.js",
     "cross": "node tools/cross/run.js",
